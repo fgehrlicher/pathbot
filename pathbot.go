@@ -27,9 +27,20 @@ type PathbotLocation struct {
 }
 
 func main() {
-	var location = start()
+	grid := NewGrid()
 
-	explore(location)
+	tile := Tile{}
+	tile.Active = true
+	tile.Exits.North = true
+	tile.MazeExitDistance = 31
+	tile.MazeExitDirection = "N"
+
+	grid.Grid = append(grid.Grid, make([]Tile, 0))
+	grid.Grid[0] = append(grid.Grid[0], tile)
+	grid.Render()
+
+	//var location = start()
+	//explore(location)
 }
 
 func start() PathbotLocation {
