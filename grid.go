@@ -15,17 +15,19 @@ type Grid struct {
 }
 
 type Tile struct {
+	Status             string `json:"status"`
+	Message            string `json:"message"`
+	Description        string `json:"description"`
 	Active             bool
-	UnderlyingLocation PathbotLocation
 	Exits              struct {
 		North bool
 		East  bool
 		South bool
 		West  bool
 	}
-	MazeExitDirection string
-	MazeExitDistance  int
-	LocationPath      string
+	MazeExitDirection string `json:"mazeExitDirection"`
+	MazeExitDistance  int    `json:"mazeExitDistance"`
+	LocationPath      string `json:"locationPath"`
 }
 
 func (grid Grid) Render() {

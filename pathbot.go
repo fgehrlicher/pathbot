@@ -16,16 +16,6 @@ type PathbotDirection struct {
 	Direction string `json:"direction"`
 }
 
-type PathbotLocation struct {
-	Status            string   `json:"status"`
-	Message           string   `json:"message"`
-	Exits             []string `json:"exits"`
-	Description       string   `json:"description"`
-	MazeExitDirection string   `json:"mazeExitDirection"`
-	MazeExitDistance  int      `json:"mazeExitDistance"`
-	LocationPath      string   `json:"locationPath"`
-}
-
 func main() {
 	grid := NewGrid()
 
@@ -43,11 +33,11 @@ func main() {
 	//explore(location)
 }
 
-func start() PathbotLocation {
+func start() Tile {
 	return apiPost("/pathbot/start", strings.NewReader("{}"))
 }
 
-func explore(location PathbotLocation) {
+func explore(location Tile) {
 	reader := bufio.NewReader(os.Stdin)
 
 	for {
@@ -57,8 +47,6 @@ func explore(location PathbotLocation) {
 			fmt.Println(location.Message)
 			os.Exit(0)
 		}
-
-		printPrompt(location.Exits)
 
 		direction, err := reader.ReadString('\n')
 		if err != nil {
@@ -77,18 +65,13 @@ func explore(location PathbotLocation) {
 	}
 }
 
-func printPrompt(directions []string) {
-	fmt.Println("What direction will you go?")
-	fmt.Println(directions)
-}
-
-func printLocation(location PathbotLocation) {
+func printLocation(location Tile) {
 	fmt.Println()
 	fmt.Println(location.Message)
 	fmt.Println(location.Description)
 }
 
-func apiPost(path string, body io.Reader) PathbotLocation {
+func apiPost(path string, body io.Reader) Tile {
 	domain := "https://api.noopschallenge.com"
 	res, err := http.Post(domain+path, "application/json", body)
 	if err != nil {
@@ -98,8 +81,8 @@ func apiPost(path string, body io.Reader) PathbotLocation {
 	return parseResponse(res)
 }
 
-func parseResponse(res *http.Response) PathbotLocation {
-	var response PathbotLocation
+func parseResponse(res *http.Response) Tile {
+	var response Tile
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		panic(err.Error())
