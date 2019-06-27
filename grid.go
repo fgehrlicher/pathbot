@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/logrusorgru/aurora"
 	"strings"
@@ -15,19 +16,60 @@ type Grid struct {
 }
 
 type Tile struct {
-	Status             string `json:"status"`
-	Message            string `json:"message"`
-	Description        string `json:"description"`
-	Active             bool
-	Exits              struct {
+	Status      string
+	Message     string
+	Description string
+	Active      bool
+	Exits       struct {
 		North bool
 		East  bool
 		South bool
 		West  bool
 	}
-	MazeExitDirection string `json:"mazeExitDirection"`
-	MazeExitDistance  int    `json:"mazeExitDistance"`
-	LocationPath      string `json:"locationPath"`
+	MazeExitDirection string
+	MazeExitDistance  int
+	LocationPath      string
+}
+
+func (tile *Tile) UnmarshalJSON(data []byte) error {
+	var (
+		err        error
+		dataStruct = struct {
+			Status            string `json:"status"`
+			Message           string `json:"message"`
+			Description       string `json:"description"`
+			Exits             []string `json:"exits"`
+			MazeExitDirection string   `json:"mazeExitDirection"`
+			MazeExitDistance  int      `json:"mazeExitDistance"`
+			LocationPath      string   `json:"locationPath"`
+		}{}
+	)
+
+	err = json.Unmarshal(data, &dataStruct)
+	if err != nil {
+		return err
+	}
+
+	tile.Status = dataStruct.Status
+	tile.Message = dataStruct.Message
+	tile.Description = dataStruct.Description
+	tile.MazeExitDirection = dataStruct.MazeExitDirection
+	tile.MazeExitDistance = dataStruct.MazeExitDistance
+	tile.LocationPath = dataStruct.LocationPath
+
+	for _, direction := range dataStruct.Exits {
+		switch direction {
+		case "N":
+			tile.Exits.North = true
+		case "E":
+			tile.Exits.East = true
+		case "S":
+			tile.Exits.South = true
+		case "W":
+			tile.Exits.West = true
+		}
+	}
+	return nil
 }
 
 func (grid Grid) Render() {
