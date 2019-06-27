@@ -59,12 +59,12 @@ func (grid Grid) Render() {
 			directionRowFilling := directionString + strings.Repeat(bodyBlock, (width-2)-len(directionString))
 
 			if tile.Active {
-				distanceRowFilling = aurora.BgGreen(distanceRowFilling).String()
-				directionRowFilling = aurora.BgGreen(directionRowFilling).String()
+				distanceRowFilling = aurora.White(aurora.BgGreen(distanceRowFilling).String()).String()
+				directionRowFilling = aurora.White(aurora.BgGreen(directionRowFilling).String()).String()
 				emptyRowFilling = aurora.BgGreen(emptyRowFilling).String()
 			} else {
-				distanceRowFilling = aurora.BgWhite(distanceRowFilling).String()
-				directionRowFilling = aurora.BgWhite(directionRowFilling).String()
+				distanceRowFilling = aurora.Black(aurora.BgWhite(distanceRowFilling).String()).String()
+				directionRowFilling = aurora.Black(aurora.BgWhite(directionRowFilling).String()).String()
 				emptyRowFilling = aurora.BgWhite(emptyRowFilling).String()
 			}
 
