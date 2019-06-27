@@ -7,26 +7,11 @@ import (
 )
 
 func NewGrid() *Grid {
-	grid := Grid{}
-	grid.Border.LeftUpperCorner = "╔"
-	grid.Border.LeftBottomCorner = "╚"
-	grid.Border.RightUpperCorner = "╗"
-	grid.Border.RightBottomCorner = "╝"
-	grid.Border.HorizontalSideBorder = "║"
-	grid.Border.VerticalSideBorder = "═"
-	return &grid
+	return &Grid{}
 }
 
 type Grid struct {
-	Grid   [][]Tile
-	Border struct {
-		LeftUpperCorner      string
-		LeftBottomCorner     string
-		RightUpperCorner     string
-		RightBottomCorner    string
-		HorizontalSideBorder string
-		VerticalSideBorder   string
-	}
+	Grid [][]Tile
 }
 
 type Tile struct {
@@ -54,36 +39,58 @@ func (grid Grid) Render() {
 		for column := 0; column < len(grid.Grid); column ++ {
 			tile := grid.Grid[column][row]
 
-			titleRowFilling := strings.Repeat(grid.Border.VerticalSideBorder, width-2)
+			borderBlock := " "
+			bodyBlock := " "
+			titleRowFilling := strings.Repeat(bodyBlock, width-2)
 			bottomRowFilling := titleRowFilling
-			emptyRowFilling := strings.Repeat(" ", width-2)
-			rightBorder := grid.Border.HorizontalSideBorder
-			leftBorder := grid.Border.HorizontalSideBorder
+			emptyRowFilling := strings.Repeat(bodyBlock, width-2)
 
-			distanceString := fmt.Sprintf(" Distance: %v ", tile.MazeExitDistance)
-			directionString := fmt.Sprintf(" Direction: %v ", tile.MazeExitDirection)
-			distanceRowFilling := distanceString + strings.Repeat(" ", (width-2)-len(distanceString))
-			directionRowFilling := directionString + strings.Repeat(" ", (width-2)-len(directionString))
+			redBorder := aurora.BgBrightRed(borderBlock).String()
+			leftBottomCorner := redBorder
+			rightBottomCorner := redBorder
+			rightUpperCorner := redBorder
+			leftUpperCorner := redBorder
+			leftBorder := redBorder
+			rightBorder := redBorder
+
+			distanceString := fmt.Sprintf(bodyBlock+"Distance: %v"+bodyBlock, tile.MazeExitDistance)
+			directionString := fmt.Sprintf(bodyBlock+"Direction: %v"+bodyBlock, tile.MazeExitDirection)
+			distanceRowFilling := distanceString + strings.Repeat(bodyBlock, (width-2)-len(distanceString))
+			directionRowFilling := directionString + strings.Repeat(bodyBlock, (width-2)-len(directionString))
+
+			if tile.Active {
+				distanceRowFilling = aurora.BgGreen(distanceRowFilling).String()
+				directionRowFilling = aurora.BgGreen(directionRowFilling).String()
+				emptyRowFilling = aurora.BgGreen(emptyRowFilling).String()
+			} else {
+				distanceRowFilling = aurora.BgWhite(distanceRowFilling).String()
+				directionRowFilling = aurora.BgWhite(directionRowFilling).String()
+				emptyRowFilling = aurora.BgWhite(emptyRowFilling).String()
+			}
 
 			if tile.Exits.North {
-				titleRowFilling = aurora.Green(titleRowFilling).String()
+				titleRowFilling = aurora.BgBrightWhite(titleRowFilling).String()
+			} else {
+				titleRowFilling = aurora.BgBrightRed(titleRowFilling).String()
 			}
 			if tile.Exits.South {
-				bottomRowFilling = aurora.Green(bottomRowFilling).String()
+				bottomRowFilling = aurora.BgBrightWhite(bottomRowFilling).String()
+			} else {
+				bottomRowFilling = aurora.BgBrightRed(bottomRowFilling).String()
 			}
 			if tile.Exits.West {
-				leftBorder = aurora.Green(leftBorder).String()
+				leftBorder = aurora.BgBrightWhite(leftBorder).String()
 			}
 			if tile.Exits.East {
-				rightBorder = aurora.Green(rightBorder).String()
+				rightBorder = aurora.BgBrightWhite(rightBorder).String()
 			}
 
-			renderMap[currentRowStart] += grid.Border.LeftUpperCorner + titleRowFilling + grid.Border.RightUpperCorner
+			renderMap[currentRowStart] += leftUpperCorner + titleRowFilling + rightUpperCorner
 			renderMap[currentRowStart+1] += leftBorder + emptyRowFilling + rightBorder
 			renderMap[currentRowStart+2] += leftBorder + distanceRowFilling + rightBorder
 			renderMap[currentRowStart+3] += leftBorder + directionRowFilling + rightBorder
 			renderMap[currentRowStart+4] += leftBorder + emptyRowFilling + rightBorder
-			renderMap[currentRowStart+5] += grid.Border.LeftBottomCorner + bottomRowFilling + grid.Border.RightBottomCorner
+			renderMap[currentRowStart+5] += leftBottomCorner + bottomRowFilling + rightBottomCorner
 		}
 		currentRowStart = currentRowStart + height
 	}
